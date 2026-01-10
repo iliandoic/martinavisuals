@@ -8,7 +8,15 @@ import { usePathname } from 'next/navigation'
 const categories = [
   { href: '/editorial', label: 'Editorial' },
   { href: '/portraits', label: 'Portraits' },
-  { href: '/events', label: 'Events' },
+  {
+    href: '/events',
+    label: 'Events',
+    subcategories: [
+      { href: '/events/baptism', label: 'Baptism' },
+      { href: '/events/maternity', label: 'Maternity' },
+      { href: '/events/family', label: 'Family' },
+    ]
+  },
   { href: '/graduation', label: 'Graduation' },
   { href: '/bts', label: 'BTS' },
 ]
@@ -16,8 +24,12 @@ const categories = [
 export default function Sidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [eventsOpen, setEventsOpen] = useState(false)
 
   const closeMenu = () => setIsOpen(false)
+
+  // Auto-expand events if we're on an events page
+  const isOnEventsPage = pathname.startsWith('/events')
 
   return (
     <>
@@ -70,15 +82,69 @@ export default function Sidebar() {
           <ul className="space-y-3">
             {categories.map((cat) => (
               <li key={cat.href}>
-                <Link
-                  href={cat.href}
-                  onClick={closeMenu}
-                  className={`text-xs font-display font-bold tracking-wide transition-colors ${
-                    pathname === cat.href || pathname === cat.href + '/' ? 'text-white' : 'text-white hover:text-neutral-400'
-                  }`}
-                >
-                  {cat.label}
-                </Link>
+                {cat.subcategories ? (
+                  // Category with subcategories (Events)
+                  <div>
+                    <button
+                      onClick={() => setEventsOpen(!eventsOpen)}
+                      className={`text-xs font-display font-bold tracking-wide transition-colors flex items-center gap-2 ${
+                        isOnEventsPage ? 'text-white' : 'text-white hover:text-neutral-400'
+                      }`}
+                    >
+                      {cat.label}
+                      <svg
+                        className={`w-3 h-3 transition-transform duration-500 ease-out ${eventsOpen || isOnEventsPage ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <div
+                      className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                      style={{
+                        maxHeight: eventsOpen || isOnEventsPage ? '150px' : '0px',
+                        opacity: eventsOpen || isOnEventsPage ? 1 : 0,
+                      }}
+                    >
+                      <ul className="mt-2 ml-3 space-y-2 pt-1">
+                        {cat.subcategories.map((sub, index) => (
+                          <li
+                            key={sub.href}
+                            className="transition-all duration-500 ease-out"
+                            style={{
+                              transform: eventsOpen || isOnEventsPage ? 'translateY(0)' : 'translateY(-8px)',
+                              opacity: eventsOpen || isOnEventsPage ? 1 : 0,
+                              transitionDelay: eventsOpen || isOnEventsPage ? `${index * 75}ms` : '0ms',
+                            }}
+                          >
+                            <Link
+                              href={sub.href}
+                              onClick={closeMenu}
+                              className={`text-xs font-display tracking-wide transition-colors duration-200 ${
+                                pathname === sub.href || pathname === sub.href + '/' ? 'text-white' : 'text-neutral-400 hover:text-white'
+                              }`}
+                            >
+                              {sub.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ) : (
+                  // Regular category
+                  <Link
+                    href={cat.href}
+                    onClick={closeMenu}
+                    className={`text-xs font-display font-bold tracking-wide transition-colors ${
+                      pathname === cat.href || pathname === cat.href + '/' ? 'text-white' : 'text-white hover:text-neutral-400'
+                    }`}
+                  >
+                    {cat.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

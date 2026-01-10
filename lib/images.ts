@@ -1,6 +1,6 @@
 export const R2_BASE_URL = 'https://pub-1600d09c709b4e389d3bb0a876a3906d.r2.dev'
 
-export type Category = 'portraits' | 'editorial' | 'events' | 'graduation' | 'bts'
+export type Category = 'portraits' | 'editorial' | 'events' | 'graduation' | 'bts' | 'events/baptism' | 'events/maternity' | 'events/family'
 
 export interface Photo {
   src: string
@@ -26,6 +26,9 @@ export const categories: { slug: Category; label: string }[] = [
   { slug: 'portraits', label: 'Portraits' },
   { slug: 'editorial', label: 'Editorial' },
   { slug: 'events', label: 'Events' },
+  { slug: 'events/baptism', label: 'Baptism' },
+  { slug: 'events/maternity', label: 'Maternity' },
+  { slug: 'events/family', label: 'Family' },
   { slug: 'graduation', label: 'Graduation' },
   { slug: 'bts', label: 'BTS' },
 ]

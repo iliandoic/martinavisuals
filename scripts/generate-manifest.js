@@ -13,7 +13,7 @@ const https = require('https')
 const http = require('http')
 
 const BUCKET_NAME = 'martinavisuals'
-const CATEGORIES = ['portraits', 'editorial', 'events', 'graduation', 'bts']
+const CATEGORIES = ['portraits', 'editorial', 'events/baptism', 'events/maternity', 'events/family', 'graduation', 'bts']
 const R2_PUBLIC_URL = 'https://pub-1600d09c709b4e389d3bb0a876a3906d.r2.dev'
 
 // Initialize S3 client for R2
