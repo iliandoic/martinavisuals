@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const categories = [
-  { href: '/portraits', label: 'Portraits' },
   { href: '/editorial', label: 'Editorial' },
+  { href: '/portraits', label: 'Portraits' },
   { href: '/events', label: 'Events' },
   { href: '/graduation', label: 'Graduation' },
   { href: '/bts', label: 'BTS' },
@@ -21,11 +21,6 @@ export default function Sidebar() {
         <h1 className="text-sm font-medium tracking-widest uppercase">Martina Visuals</h1>
         <p className="text-xs text-neutral-500 tracking-wider uppercase mt-1">Photography</p>
       </Link>
-
-      {/* Current Section Label */}
-      <div className="mb-6">
-        <p className="text-xs text-amber-600 tracking-wider uppercase">Gallery</p>
-      </div>
 
       {/* Navigation */}
       <nav className="flex-1">

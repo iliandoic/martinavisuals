@@ -45,21 +45,65 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState(-1)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Horizontal scroll with mouse wheel
+  // Horizontal scroll with mouse wheel and smooth momentum
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
 
+    let targetScroll = el.scrollLeft
+    let currentScroll = el.scrollLeft
+    let rafId: number | null = null
+
+    const smoothScroll = () => {
+      const diff = targetScroll - currentScroll
+      if (Math.abs(diff) > 0.1) {
+        currentScroll += diff * 0.08
+        el.scrollLeft = currentScroll
+        rafId = requestAnimationFrame(smoothScroll)
+      } else {
+        currentScroll = targetScroll
+        el.scrollLeft = targetScroll
+        rafId = null
+      }
+    }
+
     const handleWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault()
-        el.scrollLeft += e.deltaY
+        targetScroll += e.deltaY * 8
+        // Clamp to scroll bounds
+        targetScroll = Math.max(0, Math.min(targetScroll, el.scrollWidth - el.clientWidth))
+        if (!rafId) {
+          currentScroll = el.scrollLeft
+          smoothScroll()
+        }
       }
     }
 
     el.addEventListener('wheel', handleWheel, { passive: false })
-    return () => el.removeEventListener('wheel', handleWheel)
+    return () => {
+      el.removeEventListener('wheel', handleWheel)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
+
+  // Keyboard navigation (left/right arrows)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex >= 0) return // Don't scroll when lightbox is open
+      if (e.key === 'ArrowRight') {
+        el.scrollBy({ left: 400, behavior: 'smooth' })
+      } else if (e.key === 'ArrowLeft') {
+        el.scrollBy({ left: -400, behavior: 'smooth' })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxIndex])
 
   const lightboxSlides = photos.map((photo) => ({
     src: photo.src,
@@ -70,7 +114,7 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
     <>
       <div
         ref={scrollRef}
-        className="h-screen overflow-x-auto overflow-y-hidden flex items-center gap-4 px-4 scroll-smooth"
+        className="h-screen overflow-x-auto overflow-y-hidden flex items-center gap-4 px-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style jsx>{`
