@@ -209,8 +209,10 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
         close={() => setLightboxIndex(-1)}
         plugins={[Zoom]}
         zoom={{ maxZoomPixelRatio: 3 }}
+        controller={{ closeOnBackdropClick: true }}
+        animation={{ fade: 300, swipe: 500 }}
         styles={{
-          container: { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+          container: { backgroundColor: 'rgba(0, 0, 0, 0.9)' },
           slide: {
             padding: '40px',
           },
