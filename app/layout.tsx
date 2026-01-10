@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Inter, DM_Sans, Cinzel } from 'next/font/google'
 import Sidebar from '@/components/Sidebar'
+import ScrollProgress from '@/components/ScrollProgress'
 import './globals.css'
 
 const playfair = Playfair_Display({
@@ -45,6 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${inter.variable} ${dmSans.variable} ${cinzel.variable} min-h-screen bg-black text-white font-sans`}>
+        <ScrollProgress />
         <Sidebar />
         <main className="lg:ml-64 pt-14 lg:pt-0">
           {children}

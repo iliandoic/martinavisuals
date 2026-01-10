@@ -177,6 +177,7 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
 
       <div
         ref={scrollRef}
+        data-scroll-container
         className="min-h-[calc(100vh-56px)] lg:h-screen overflow-y-auto lg:overflow-y-hidden lg:overflow-x-auto flex flex-col lg:flex-row lg:items-center gap-4 p-4 lg:px-4 lg:py-0"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
