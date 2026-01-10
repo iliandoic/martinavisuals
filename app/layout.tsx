@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-black text-white">
         <Sidebar />
-        <main className="ml-64">
+        <main className="lg:ml-64 pt-14 lg:pt-0">
           {children}
         </main>
       </body>

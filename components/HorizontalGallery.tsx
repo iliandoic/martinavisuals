@@ -16,16 +16,12 @@ function GalleryImage({ photo, index, onClick }: { photo: Photo; index: number; 
 
   return (
     <div
-      className="flex-shrink-0 h-[85vh] relative cursor-pointer group"
+      className="flex-shrink-0 w-full lg:w-auto lg:h-[85vh] relative cursor-pointer group"
       onClick={onClick}
     >
       {/* Skeleton placeholder */}
       <div
         className={`absolute inset-0 bg-neutral-900 transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100 animate-pulse'}`}
-        style={{
-          width: `${(photo.width / photo.height) * 85}vh`,
-          height: '85vh'
-        }}
       />
 
       <img
@@ -33,7 +29,7 @@ function GalleryImage({ photo, index, onClick }: { photo: Photo; index: number; 
         alt={photo.alt}
         loading={index < 2 ? 'eager' : 'lazy'}
         onLoad={() => setLoaded(true)}
-        className={`h-full w-auto object-contain transition-all duration-700 ease-out group-hover:opacity-60 group-hover:brightness-75 ${
+        className={`w-full lg:w-auto lg:h-full object-contain transition-all duration-700 ease-out group-hover:opacity-60 group-hover:brightness-75 ${
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -45,7 +41,7 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState(-1)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Horizontal scroll with mouse wheel and smooth momentum
+  // Horizontal scroll with mouse wheel and smooth momentum (desktop only)
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -68,6 +64,9 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
     }
 
     const handleWheel = (e: WheelEvent) => {
+      // Only apply horizontal scroll on desktop (lg breakpoint = 1024px)
+      if (window.innerWidth < 1024) return
+
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault()
         targetScroll += e.deltaY * 8
@@ -114,7 +113,7 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
     <>
       <div
         ref={scrollRef}
-        className="h-screen overflow-x-auto overflow-y-hidden flex items-center gap-4 px-4"
+        className="min-h-[calc(100vh-56px)] lg:h-screen overflow-y-auto lg:overflow-y-hidden lg:overflow-x-auto flex flex-col lg:flex-row lg:items-center gap-4 p-4 lg:px-4 lg:py-0"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style jsx>{`
