@@ -38,3 +38,14 @@ body {
 ::selection {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* Lightbox adjustments on mobile */
+@media (max-width: 1023px) {
+  .yarl__slide {
+    padding: 40px !important;
+  }
+  .yarl__navigation_prev,
+  .yarl__navigation_next {
+    padding: 8px 4px !important;
+  }
+}
