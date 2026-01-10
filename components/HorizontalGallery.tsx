@@ -68,9 +68,27 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
 
   const isReady = loadedCount >= 1
 
-  // Reset when photos change
+  // Reset when photos change + timeout fallback
   useEffect(() => {
     setLoadedCount(0)
+
+    // Fallback timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      setLoadedCount((prev) => Math.max(prev, 1))
+    }, 5000)
+
+    // Handle tab visibility change
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        setLoadedCount((prev) => Math.max(prev, 1))
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      clearTimeout(timeout)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
   }, [photos])
 
   const handleImageLoad = () => {
