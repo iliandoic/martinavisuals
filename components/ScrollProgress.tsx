@@ -63,7 +63,7 @@ export default function ScrollProgress() {
   }, [pathname, setupScrollListener])
 
   return (
-    <div className="fixed top-14 lg:top-0 left-0 lg:left-64 right-0 h-[3px] z-[60] bg-neutral-800">
+    <div className="hidden lg:block fixed top-0 left-64 right-0 h-[3px] z-[60] bg-neutral-800">
       <div
         className="h-full bg-neutral-400"
         style={{ width: `${progress}%` }}
