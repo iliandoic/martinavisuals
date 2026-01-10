@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import 'yet-another-react-lightbox/styles.css'
@@ -10,6 +9,36 @@ import { Photo } from '@/lib/images'
 
 interface HorizontalGalleryProps {
   photos: Photo[]
+}
+
+function GalleryImage({ photo, index, onClick }: { photo: Photo; index: number; onClick: () => void }) {
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <div
+      className="flex-shrink-0 h-[85vh] relative cursor-pointer group"
+      onClick={onClick}
+    >
+      {/* Skeleton placeholder */}
+      <div
+        className={`absolute inset-0 bg-neutral-900 transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100 animate-pulse'}`}
+        style={{
+          width: `${(photo.width / photo.height) * 85}vh`,
+          height: '85vh'
+        }}
+      />
+
+      <img
+        src={photo.src}
+        alt={photo.alt}
+        loading={index < 2 ? 'eager' : 'lazy'}
+        onLoad={() => setLoaded(true)}
+        className={`h-full w-auto object-contain transition-all duration-700 ease-out group-hover:opacity-60 group-hover:brightness-75 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+    </div>
+  )
 }
 
 export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
@@ -51,20 +80,12 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
         `}</style>
 
         {photos.map((photo, index) => (
-          <div
+          <GalleryImage
             key={index}
-            className="flex-shrink-0 h-[85vh] relative cursor-pointer group"
+            photo={photo}
+            index={index}
             onClick={() => setLightboxIndex(index)}
-          >
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              width={photo.width}
-              height={photo.height}
-              className="h-full w-auto object-contain transition-all duration-500 ease-in-out group-hover:opacity-60 group-hover:brightness-75"
-              priority={index < 3}
-            />
-          </div>
+          />
         ))}
 
         {/* End spacer */}
@@ -83,19 +104,6 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
           slide: {
             padding: '40px',
           },
-        }}
-        render={{
-          slide: ({ slide }) => (
-            <div className="flex items-center justify-center h-full">
-              <div className="relative bg-white" style={{ padding: '50px' }}>
-                <img
-                  src={slide.src}
-                  alt={slide.alt || ''}
-                  className="max-h-[80vh] max-w-[80vw] object-contain"
-                />
-              </div>
-            </div>
-          ),
         }}
         carousel={{
           finite: false,
