@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const categories = [
@@ -22,8 +23,9 @@ export default function Sidebar() {
     <>
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black border-b border-white/5 px-4 py-3 flex items-center justify-between">
-        <Link href="/" onClick={closeMenu}>
-          <h1 className="text-lg font-serif font-medium tracking-wide">Martina Visuals</h1>
+        <Link href="/" onClick={closeMenu} className="flex flex-col">
+          <span className="text-lg font-script tracking-widest uppercase">Martina Visuals</span>
+          <span className="text-[10px] font-display tracking-[0.3em] uppercase mt-1">Photography</span>
         </Link>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -58,9 +60,9 @@ export default function Sidebar() {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Logo / Name */}
-        <Link href="/" className="mb-12" onClick={closeMenu}>
-          <h1 className="text-xl font-serif font-medium tracking-wide">Martina Visuals</h1>
-          <p className="text-xs text-neutral-500 tracking-wider mt-1 font-sans">Photography</p>
+        <Link href="/" className="mb-12 flex flex-col" onClick={closeMenu}>
+          <span className="text-lg font-script tracking-widest uppercase">Martina Visuals</span>
+          <span className="text-[10px] font-display tracking-[0.3em] uppercase mt-1 text-neutral-400">Photography</span>
         </Link>
 
         {/* Navigation */}
@@ -71,8 +73,8 @@ export default function Sidebar() {
                 <Link
                   href={cat.href}
                   onClick={closeMenu}
-                  className={`text-xs font-display font-semibold tracking-wide transition-colors ${
-                    pathname === cat.href || pathname === cat.href + '/' ? 'text-white' : 'text-white/90 hover:text-neutral-400'
+                  className={`text-xs font-display font-bold tracking-wide transition-colors ${
+                    pathname === cat.href || pathname === cat.href + '/' ? 'text-white' : 'text-white hover:text-neutral-400'
                   }`}
                 >
                   {cat.label}
@@ -86,8 +88,8 @@ export default function Sidebar() {
             <Link
               href="/about/"
               onClick={closeMenu}
-              className={`text-xs font-display font-semibold tracking-wide transition-colors ${
-                pathname === '/about/' ? 'text-white' : 'text-white/90 hover:text-neutral-400'
+              className={`text-xs font-display font-bold tracking-wide transition-colors ${
+                pathname === '/about/' ? 'text-white' : 'text-white hover:text-neutral-400'
               }`}
             >
               About / Contact
