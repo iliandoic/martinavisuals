@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import 'yet-another-react-lightbox/styles.css'
@@ -14,30 +15,27 @@ interface HorizontalGalleryProps {
 function GalleryImage({
   photo,
   index,
-  onClick,
-  onLoad,
-  isReady
+  onClick
 }: {
   photo: Photo
   index: number
   onClick: () => void
-  onLoad: () => void
-  isReady: boolean
 }) {
   return (
     <div
-      className={`flex-shrink-0 w-full lg:w-auto lg:h-[85vh] relative cursor-pointer group transition-all duration-700 ease-out ${
-        isReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
-      style={{ transitionDelay: isReady ? `${index * 100}ms` : '0ms' }}
+      className="flex-shrink-0 w-full lg:w-auto lg:h-[85vh] relative cursor-pointer group"
       onClick={onClick}
     >
-      <img
+      <Image
         src={photo.src}
         alt={photo.alt}
-        loading={index < 3 ? 'eager' : 'lazy'}
-        onLoad={onLoad}
+        width={photo.width}
+        height={photo.height}
+        priority={index < 2}
+        placeholder="blur"
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
         className="w-full lg:w-auto lg:h-full object-contain transition-all duration-500 ease-out group-hover:opacity-60 group-hover:brightness-75"
+        sizes="(max-width: 1024px) 100vw, 85vh"
       />
     </div>
   )
@@ -45,15 +43,7 @@ function GalleryImage({
 
 export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState(-1)
-  const [loadedCount, setLoadedCount] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  const initialLoadCount = Math.min(3, photos.length)
-  const isReady = loadedCount >= initialLoadCount
-
-  const handleImageLoad = () => {
-    setLoadedCount((prev) => prev + 1)
-  }
 
   // Horizontal scroll with mouse wheel and smooth momentum (desktop only)
   useEffect(() => {
@@ -125,16 +115,6 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
 
   return (
     <>
-      {/* Loading indicator */}
-      {!isReady && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black lg:ml-64">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-            <p className="text-sm text-neutral-500 tracking-wider uppercase">Loading</p>
-          </div>
-        </div>
-      )}
-
       <div
         ref={scrollRef}
         className="min-h-[calc(100vh-56px)] lg:h-screen overflow-y-auto lg:overflow-y-hidden lg:overflow-x-auto flex flex-col lg:flex-row lg:items-center gap-4 p-4 lg:px-4 lg:py-0"
@@ -152,8 +132,6 @@ export default function HorizontalGallery({ photos }: HorizontalGalleryProps) {
             photo={photo}
             index={index}
             onClick={() => setLightboxIndex(index)}
-            onLoad={handleImageLoad}
-            isReady={isReady}
           />
         ))}
 

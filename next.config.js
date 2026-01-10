@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'pub-1600d09c709b4e389d3bb0a876a3906d.r2.dev',
+      },
+    ],
+    formats: ['image/avif', 'image/webp'],
   },
   trailingSlash: true,
 }
