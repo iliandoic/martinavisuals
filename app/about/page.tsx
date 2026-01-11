@@ -28,13 +28,13 @@ export default function AboutPage() {
               <h1 className="text-3xl font-medium mb-6">About</h1>
               <div className="space-y-4 text-neutral-400 text-sm leading-relaxed">
                 <p>
-                  Martina is a photographer based in Sofia/Stara Zagora, dedicated to capturing
+                  I'm a photographer based in Sofia/Stara Zagora, dedicated to capturing
                   your best moments in life!
                 </p>
                 <p>
-                  With over a decade of experience, she has worked with clients ranging
-                  from independent artists to major publications. Her approach combines
-                  technical precision with an intuitive understanding of her subjects.
+                  With over a decade of experience, I've worked with clients ranging
+                  from independent artists to major publications. My approach combines
+                  technical precision with an intuitive understanding of my subjects.
                 </p>
                 <p>
                   Available for commissions, editorial work, and select personal projects
