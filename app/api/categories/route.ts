@@ -9,6 +9,16 @@ function getDisplayName(folderName: string): string {
   return folderName.replace(/^\d+[-.\s]*/, '')
 }
 
+// Convert folder name to clean URL slug
+function toSlug(folderName: string): string {
+  return getDisplayName(folderName)
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // spaces to dashes
+    .replace(/[^a-z0-9-]/g, '')     // remove special chars
+    .replace(/-+/g, '-')            // collapse multiple dashes
+    .replace(/^-|-$/g, '')          // trim dashes from ends
+}
+
 const s3 = new S3Client({
   region: 'auto',
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -67,7 +77,7 @@ export async function GET() {
 
             if (subHasImages) {
               subcategories.push({
-                slug: getDisplayName(subFolder),
+                slug: toSlug(subFolder),
                 fullPath: `${folder}/${subFolder}`,
                 label: getDisplayName(subFolder),
               })
@@ -78,7 +88,7 @@ export async function GET() {
         // Only add category if it has images or non-empty subcategories
         if (hasImages || subcategories.length > 0) {
           categories.push({
-            slug: getDisplayName(folder),
+            slug: toSlug(folder),
             fullPath: folder,
             label: getDisplayName(folder),
             ...(subcategories.length > 0 && { subcategories }),

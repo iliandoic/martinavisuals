@@ -9,6 +9,16 @@ function getDisplayName(folderName: string): string {
   return folderName.replace(/^\d+[-.\s]*/, '')
 }
 
+// Convert folder name to clean URL slug (must match categories route)
+function toSlug(folderName: string): string {
+  return getDisplayName(folderName)
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // spaces to dashes
+    .replace(/[^a-z0-9-]/g, '')     // remove special chars
+    .replace(/-+/g, '-')            // collapse multiple dashes
+    .replace(/^-|-$/g, '')          // trim dashes from ends
+}
+
 const s3 = new S3Client({
   region: 'auto',
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -35,7 +45,7 @@ async function findFolderPath(cleanSlug: string): Promise<string | null> {
   let matchedFolder: string | null = null
   for (const prefix of response.CommonPrefixes) {
     const folder = prefix.Prefix?.replace('/', '') || ''
-    if (getDisplayName(folder).toLowerCase() === parts[0].toLowerCase()) {
+    if (toSlug(folder) === parts[0].toLowerCase()) {
       matchedFolder = folder
       break
     }
@@ -56,7 +66,7 @@ async function findFolderPath(cleanSlug: string): Promise<string | null> {
 
     for (const subPrefix of subResponse.CommonPrefixes) {
       const subFolder = subPrefix.Prefix?.replace(`${matchedFolder}/`, '').replace('/', '') || ''
-      if (getDisplayName(subFolder).toLowerCase() === parts[1].toLowerCase()) {
+      if (toSlug(subFolder) === parts[1].toLowerCase()) {
         return `${matchedFolder}/${subFolder}`
       }
     }
