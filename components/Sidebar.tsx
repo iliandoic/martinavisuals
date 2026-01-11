@@ -6,25 +6,27 @@ import { usePathname } from 'next/navigation'
 
 interface Category {
   slug: string
+  fullPath: string
   label: string
-  subcategories?: { slug: string; label: string }[]
+  subcategories?: { slug: string; fullPath: string; label: string }[]
 }
 
 // Fallback categories in case API fails
-const fallbackCategories = [
-  { slug: 'editorial', label: 'Editorial' },
-  { slug: 'portraits', label: 'Portraits' },
+const fallbackCategories: Category[] = [
+  { slug: 'editorial', fullPath: 'editorial', label: 'Editorial' },
+  { slug: 'portraits', fullPath: 'portraits', label: 'Portraits' },
   {
     slug: 'events',
+    fullPath: 'events',
     label: 'Events',
     subcategories: [
-      { slug: 'baptism', label: 'Baptism' },
-      { slug: 'maternity', label: 'Maternity' },
-      { slug: 'family', label: 'Family' },
+      { slug: 'baptism', fullPath: 'events/baptism', label: 'Baptism' },
+      { slug: 'maternity', fullPath: 'events/maternity', label: 'Maternity' },
+      { slug: 'family', fullPath: 'events/family', label: 'Family' },
     ]
   },
-  { slug: 'graduation', label: 'Graduation' },
-  { slug: 'bts', label: 'BTS' },
+  { slug: 'graduation', fullPath: 'graduation', label: 'Graduation' },
+  { slug: 'bts', fullPath: 'bts', label: 'BTS' },
 ]
 
 export default function Sidebar() {

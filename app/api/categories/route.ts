@@ -27,7 +27,7 @@ export async function GET() {
 
     const response = await s3.send(command)
 
-    const categories: { slug: string; label: string; subcategories?: { slug: string; label: string }[] }[] = []
+    const categories: { slug: string; fullPath: string; label: string; subcategories?: { slug: string; fullPath: string; label: string }[] }[] = []
 
     if (response.CommonPrefixes) {
       for (const prefix of response.CommonPrefixes) {
@@ -67,7 +67,8 @@ export async function GET() {
 
             if (subHasImages) {
               subcategories.push({
-                slug: subFolder,
+                slug: getDisplayName(subFolder),
+                fullPath: `${folder}/${subFolder}`,
                 label: getDisplayName(subFolder),
               })
             }
@@ -77,7 +78,8 @@ export async function GET() {
         // Only add category if it has images or non-empty subcategories
         if (hasImages || subcategories.length > 0) {
           categories.push({
-            slug: folder,
+            slug: getDisplayName(folder),
+            fullPath: folder,
             label: getDisplayName(folder),
             ...(subcategories.length > 0 && { subcategories }),
           })
