@@ -1,35 +1,56 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
-const categories = [
-  { href: '/editorial', label: 'Editorial' },
-  { href: '/portraits', label: 'Portraits' },
+interface Category {
+  slug: string
+  label: string
+  subcategories?: { slug: string; label: string }[]
+}
+
+// Fallback categories in case API fails
+const fallbackCategories = [
+  { slug: 'editorial', label: 'Editorial' },
+  { slug: 'portraits', label: 'Portraits' },
   {
-    href: '/events',
+    slug: 'events',
     label: 'Events',
     subcategories: [
-      { href: '/events/baptism', label: 'Baptism' },
-      { href: '/events/maternity', label: 'Maternity' },
-      { href: '/events/family', label: 'Family' },
+      { slug: 'baptism', label: 'Baptism' },
+      { slug: 'maternity', label: 'Maternity' },
+      { slug: 'family', label: 'Family' },
     ]
   },
-  { href: '/graduation', label: 'Graduation' },
-  { href: '/bts', label: 'BTS' },
+  { slug: 'graduation', label: 'Graduation' },
+  { slug: 'bts', label: 'BTS' },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
+  const [categories, setCategories] = useState<Category[]>(fallbackCategories)
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.categories && data.categories.length > 0) {
+            setCategories(data.categories)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const closeMenu = () => setIsOpen(false)
-
-  // Auto-expand events if we're on an events page
-  const isOnEventsPage = pathname.startsWith('/events')
 
   return (
     <>
@@ -80,73 +101,81 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1">
           <ul className="space-y-3">
-            {categories.map((cat) => (
-              <li key={cat.href}>
-                {cat.subcategories ? (
-                  // Category with subcategories (Events)
-                  <div>
-                    <button
-                      onClick={() => setEventsOpen(!eventsOpen)}
-                      className={`text-xs font-display font-bold tracking-wide transition-colors flex items-center gap-2 ${
-                        isOnEventsPage ? 'text-white' : 'text-white hover:text-neutral-400'
+            {categories.map((cat) => {
+              const href = `/${cat.slug}`
+              const isOnThisCategory = pathname.startsWith(href)
+
+              return (
+                <li key={cat.slug}>
+                  {cat.subcategories ? (
+                    // Category with subcategories (Events)
+                    <div>
+                      <button
+                        onClick={() => setEventsOpen(!eventsOpen)}
+                        className={`text-xs font-display font-bold tracking-wide transition-colors flex items-center gap-2 ${
+                          isOnThisCategory ? 'text-white' : 'text-white hover:text-neutral-400'
+                        }`}
+                      >
+                        {cat.label}
+                        <svg
+                          className={`w-3 h-3 transition-transform duration-500 ease-out ${eventsOpen || isOnThisCategory ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <div
+                        className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                        style={{
+                          maxHeight: eventsOpen || isOnThisCategory ? `${cat.subcategories.length * 30 + 20}px` : '0px',
+                          opacity: eventsOpen || isOnThisCategory ? 1 : 0,
+                        }}
+                      >
+                        <ul className="mt-2 ml-3 space-y-2 pt-1">
+                          {cat.subcategories.map((sub, index) => {
+                            const subHref = `/${cat.slug}/${sub.slug}`
+                            return (
+                              <li
+                                key={sub.slug}
+                                className="transition-all duration-500 ease-out"
+                                style={{
+                                  transform: eventsOpen || isOnThisCategory ? 'translateY(0)' : 'translateY(-8px)',
+                                  opacity: eventsOpen || isOnThisCategory ? 1 : 0,
+                                  transitionDelay: eventsOpen || isOnThisCategory ? `${index * 75}ms` : '0ms',
+                                }}
+                              >
+                                <Link
+                                  href={subHref}
+                                  onClick={closeMenu}
+                                  className={`text-xs font-display tracking-wide transition-colors duration-200 ${
+                                    pathname === subHref || pathname === subHref + '/' ? 'text-white' : 'text-neutral-400 hover:text-white'
+                                  }`}
+                                >
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    </div>
+                  ) : (
+                    // Regular category
+                    <Link
+                      href={href}
+                      onClick={closeMenu}
+                      className={`text-xs font-display font-bold tracking-wide transition-colors ${
+                        pathname === href || pathname === href + '/' ? 'text-white' : 'text-white hover:text-neutral-400'
                       }`}
                     >
                       {cat.label}
-                      <svg
-                        className={`w-3 h-3 transition-transform duration-500 ease-out ${eventsOpen || isOnEventsPage ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    <div
-                      className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                      style={{
-                        maxHeight: eventsOpen || isOnEventsPage ? '150px' : '0px',
-                        opacity: eventsOpen || isOnEventsPage ? 1 : 0,
-                      }}
-                    >
-                      <ul className="mt-2 ml-3 space-y-2 pt-1">
-                        {cat.subcategories.map((sub, index) => (
-                          <li
-                            key={sub.href}
-                            className="transition-all duration-500 ease-out"
-                            style={{
-                              transform: eventsOpen || isOnEventsPage ? 'translateY(0)' : 'translateY(-8px)',
-                              opacity: eventsOpen || isOnEventsPage ? 1 : 0,
-                              transitionDelay: eventsOpen || isOnEventsPage ? `${index * 75}ms` : '0ms',
-                            }}
-                          >
-                            <Link
-                              href={sub.href}
-                              onClick={closeMenu}
-                              className={`text-xs font-display tracking-wide transition-colors duration-200 ${
-                                pathname === sub.href || pathname === sub.href + '/' ? 'text-white' : 'text-neutral-400 hover:text-white'
-                              }`}
-                            >
-                              {sub.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ) : (
-                  // Regular category
-                  <Link
-                    href={cat.href}
-                    onClick={closeMenu}
-                    className={`text-xs font-display font-bold tracking-wide transition-colors ${
-                      pathname === cat.href || pathname === cat.href + '/' ? 'text-white' : 'text-white hover:text-neutral-400'
-                    }`}
-                  >
-                    {cat.label}
-                  </Link>
-                )}
-              </li>
-            ))}
+                    </Link>
+                  )}
+                </li>
+              )
+            })}
           </ul>
 
           {/* About / Contact */}
