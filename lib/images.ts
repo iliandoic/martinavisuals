@@ -36,7 +36,7 @@ export const categories: { slug: Category; label: string }[] = [
 export function manifestToPhotos(manifest: Manifest, category: Category): Photo[] {
   const images = manifest.images[category] || []
   return images.map((img) => ({
-    src: `${R2_BASE_URL}/${category}/${img.filename}?v=2`,
+    src: `${R2_BASE_URL}/${category}/${img.filename}`,
     width: img.width,
     height: img.height,
     alt: img.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import HorizontalGallery from './HorizontalGallery'
-import { Category, Photo, Manifest, R2_BASE_URL, manifestToPhotos } from '@/lib/images'
+import { Category, Photo } from '@/lib/images'
 
 interface CategoryGalleryProps {
   category: Category
@@ -16,16 +16,22 @@ export default function CategoryGallery({ category }: CategoryGalleryProps) {
   useEffect(() => {
     async function loadPhotos() {
       try {
-        const res = await fetch(`${R2_BASE_URL}/manifest.json`)
+        const res = await fetch(`/api/images/${encodeURIComponent(category)}`)
         if (!res.ok) {
-          throw new Error('Failed to load manifest')
+          throw new Error('Failed to load images')
         }
-        const manifest: Manifest = await res.json()
-        const categoryPhotos = manifestToPhotos(manifest, category)
+        const data = await res.json()
+        const categoryPhotos: Photo[] = data.images.map((img: { src: string; filename: string }) => ({
+          src: img.src,
+          width: 1200,
+          height: 800,
+          alt: img.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+          category,
+        }))
         setPhotos(categoryPhotos)
       } catch (err) {
         setError('Unable to load images. Please try again later.')
-        console.error('Failed to fetch manifest:', err)
+        console.error('Failed to fetch images:', err)
       } finally {
         setLoading(false)
       }
