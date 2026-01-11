@@ -32,8 +32,7 @@ export default function AboutPage() {
                   your best moments in life!
                 </p>
                 <p>
-                  With over a decade of experience, I've worked with clients ranging
-                  from independent artists to major publications. My approach combines
+                  With over a decade of experience, my approach combines
                   technical precision with an intuitive understanding of my subjects.
                 </p>
                 <p>
