@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -28,6 +28,38 @@ const fallbackCategories: Category[] = [
   { slug: 'graduation', fullPath: 'graduation', label: 'Graduation' },
   { slug: 'bts', fullPath: 'bts', label: 'BTS' },
 ]
+
+// Expandable submenu component with auto-height
+function ExpandableMenu({
+  isExpanded,
+  children
+}: {
+  isExpanded: boolean
+  children: React.ReactNode
+}) {
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState(0)
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setHeight(contentRef.current.scrollHeight)
+    }
+  }, [children])
+
+  return (
+    <div
+      className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      style={{
+        maxHeight: isExpanded ? `${height}px` : '0px',
+        opacity: isExpanded ? 1 : 0,
+      }}
+    >
+      <div ref={contentRef}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -143,13 +175,7 @@ export default function Sidebar() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </button>
-                          <div
-                            className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                            style={{
-                              maxHeight: isExpanded ? '500px' : '0px',
-                              opacity: isExpanded ? 1 : 0,
-                            }}
-                          >
+                          <ExpandableMenu isExpanded={isExpanded}>
                             <ul className="mt-2 ml-3 space-y-2 pt-1">
                               {cat.subcategories.map((sub, index) => {
                                 const subHref = `/${cat.slug}/${sub.slug}`
@@ -176,7 +202,7 @@ export default function Sidebar() {
                                 )
                               })}
                             </ul>
-                          </div>
+                          </ExpandableMenu>
                         </div>
                       )
                     })()
