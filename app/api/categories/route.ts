@@ -3,6 +3,12 @@ import { NextResponse } from 'next/server'
 
 const BUCKET_NAME = 'martinavisuals'
 
+// Strip prefix like "01-" or "1. " from folder name for display
+function getDisplayName(folderName: string): string {
+  // Remove leading numbers, dots, dashes, spaces (e.g., "01-Editorial" -> "Editorial")
+  return folderName.replace(/^\d+[-.\s]*/, '')
+}
+
 const s3 = new S3Client({
   region: 'auto',
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -44,7 +50,7 @@ export async function GET() {
             if (subFolder) {
               subcategories.push({
                 slug: subFolder,
-                label: subFolder.charAt(0).toUpperCase() + subFolder.slice(1),
+                label: getDisplayName(subFolder),
               })
             }
           }
@@ -52,7 +58,7 @@ export async function GET() {
 
         categories.push({
           slug: folder,
-          label: folder.charAt(0).toUpperCase() + folder.slice(1),
+          label: getDisplayName(folder),
           ...(subcategories.length > 0 && { subcategories }),
         })
       }
