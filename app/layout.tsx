@@ -31,10 +31,12 @@ export const metadata: Metadata = {
   title: 'Martina Visuals | Photography',
   description: 'Stunning photography by Martina capturing moments that matter.',
   keywords: ['photography', 'martina visuals', 'photographer', 'images', 'gallery'],
+  metadataBase: new URL('https://martinavisuals.com'),
   openGraph: {
     title: 'Martina Visuals | Photography',
     description: 'Stunning photography by Martina capturing moments that matter.',
     type: 'website',
+    images: ['/images/og-image.jpg'],
   },
 }
 
