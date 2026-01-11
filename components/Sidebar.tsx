@@ -30,8 +30,20 @@ const fallbackCategories = [
 export default function Sidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const [eventsOpen, setEventsOpen] = useState(false)
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set())
   const [categories, setCategories] = useState<Category[]>(fallbackCategories)
+
+  const toggleMenu = (slug: string) => {
+    setExpandedMenus(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(slug)) {
+        newSet.delete(slug)
+      } else {
+        newSet.add(slug)
+      }
+      return newSet
+    })
+  }
 
   useEffect(() => {
     async function fetchCategories() {
@@ -108,59 +120,64 @@ export default function Sidebar() {
               return (
                 <li key={cat.slug}>
                   {cat.subcategories ? (
-                    // Category with subcategories (Events)
-                    <div>
-                      <button
-                        onClick={() => setEventsOpen(!eventsOpen)}
-                        className={`text-xs font-display font-bold tracking-wide transition-colors flex items-center gap-2 ${
-                          isOnThisCategory ? 'text-white' : 'text-white hover:text-neutral-400'
-                        }`}
-                      >
-                        {cat.label}
-                        <svg
-                          className={`w-3 h-3 transition-transform duration-500 ease-out ${eventsOpen || isOnThisCategory ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <div
-                        className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                        style={{
-                          maxHeight: eventsOpen || isOnThisCategory ? `${cat.subcategories.length * 30 + 20}px` : '0px',
-                          opacity: eventsOpen || isOnThisCategory ? 1 : 0,
-                        }}
-                      >
-                        <ul className="mt-2 ml-3 space-y-2 pt-1">
-                          {cat.subcategories.map((sub, index) => {
-                            const subHref = `/${cat.slug}/${sub.slug}`
-                            return (
-                              <li
-                                key={sub.slug}
-                                className="transition-all duration-500 ease-out"
-                                style={{
-                                  transform: eventsOpen || isOnThisCategory ? 'translateY(0)' : 'translateY(-8px)',
-                                  opacity: eventsOpen || isOnThisCategory ? 1 : 0,
-                                  transitionDelay: eventsOpen || isOnThisCategory ? `${index * 75}ms` : '0ms',
-                                }}
-                              >
-                                <Link
-                                  href={subHref}
-                                  onClick={closeMenu}
-                                  className={`text-xs font-display tracking-wide transition-colors duration-200 ${
-                                    pathname === subHref || pathname === subHref + '/' ? 'text-white' : 'text-neutral-400 hover:text-white'
-                                  }`}
-                                >
-                                  {sub.label}
-                                </Link>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </div>
-                    </div>
+                    // Category with subcategories
+                    (() => {
+                      const isExpanded = expandedMenus.has(cat.slug) || isOnThisCategory
+                      return (
+                        <div>
+                          <button
+                            onClick={() => toggleMenu(cat.slug)}
+                            className={`text-xs font-display font-bold tracking-wide transition-colors flex items-center gap-2 ${
+                              isOnThisCategory ? 'text-white' : 'text-white hover:text-neutral-400'
+                            }`}
+                          >
+                            {cat.label}
+                            <svg
+                              className={`w-3 h-3 transition-transform duration-500 ease-out ${isExpanded ? 'rotate-180' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          <div
+                            className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                            style={{
+                              maxHeight: isExpanded ? `${cat.subcategories.length * 30 + 20}px` : '0px',
+                              opacity: isExpanded ? 1 : 0,
+                            }}
+                          >
+                            <ul className="mt-2 ml-3 space-y-2 pt-1">
+                              {cat.subcategories.map((sub, index) => {
+                                const subHref = `/${cat.slug}/${sub.slug}`
+                                return (
+                                  <li
+                                    key={sub.slug}
+                                    className="transition-all duration-500 ease-out"
+                                    style={{
+                                      transform: isExpanded ? 'translateY(0)' : 'translateY(-8px)',
+                                      opacity: isExpanded ? 1 : 0,
+                                      transitionDelay: isExpanded ? `${index * 75}ms` : '0ms',
+                                    }}
+                                  >
+                                    <Link
+                                      href={subHref}
+                                      onClick={closeMenu}
+                                      className={`text-xs font-display tracking-wide transition-colors duration-200 ${
+                                        pathname === subHref || pathname === subHref + '/' ? 'text-white' : 'text-neutral-400 hover:text-white'
+                                      }`}
+                                    >
+                                      {sub.label}
+                                    </Link>
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          </div>
+                        </div>
+                      )
+                    })()
                   ) : (
                     // Regular category
                     <Link
