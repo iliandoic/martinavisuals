@@ -146,7 +146,7 @@ export default function Sidebar() {
                           <div
                             className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                             style={{
-                              maxHeight: isExpanded ? `${cat.subcategories.length * 30 + 20}px` : '0px',
+                              maxHeight: isExpanded ? '500px' : '0px',
                               opacity: isExpanded ? 1 : 0,
                             }}
                           >
