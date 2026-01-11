@@ -9,9 +9,14 @@ interface PageProps {
   params: { category: string }
 }
 
+// Strip prefix like "01-" or "1. " from folder name for display
+function getDisplayName(folderName: string): string {
+  return folderName.replace(/^\d+[-.\s]*/, '')
+}
+
 // Generate metadata for each category
 export function generateMetadata({ params }: PageProps): Metadata {
-  const label = params.category.charAt(0).toUpperCase() + params.category.slice(1)
+  const label = getDisplayName(params.category)
 
   return {
     title: `${label} | Martina Visuals`,

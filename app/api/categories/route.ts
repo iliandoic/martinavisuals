@@ -34,7 +34,7 @@ export async function GET() {
         const folder = prefix.Prefix?.replace('/', '') || ''
         if (!folder) continue
 
-        // Check for subcategories
+        // Check for subcategories and images
         const subCommand = new ListObjectsV2Command({
           Bucket: BUCKET_NAME,
           Prefix: `${folder}/`,
@@ -42,12 +42,30 @@ export async function GET() {
         })
         const subResponse = await s3.send(subCommand)
 
+        // Check if folder has images directly
+        const hasImages = subResponse.Contents?.some(obj =>
+          obj.Key && obj.Key !== `${folder}/` && obj.Key.match(/\.(jpg|jpeg|png|webp|gif)$/i)
+        )
+
         const subcategories: { slug: string; label: string }[] = []
 
         if (subResponse.CommonPrefixes) {
           for (const subPrefix of subResponse.CommonPrefixes) {
             const subFolder = subPrefix.Prefix?.replace(`${folder}/`, '').replace('/', '') || ''
-            if (subFolder) {
+            if (!subFolder) continue
+
+            // Check if subcategory has images
+            const subImagesCommand = new ListObjectsV2Command({
+              Bucket: BUCKET_NAME,
+              Prefix: `${folder}/${subFolder}/`,
+              MaxKeys: 1,
+            })
+            const subImagesResponse = await s3.send(subImagesCommand)
+            const subHasImages = subImagesResponse.Contents?.some(obj =>
+              obj.Key && obj.Key.match(/\.(jpg|jpeg|png|webp|gif)$/i)
+            )
+
+            if (subHasImages) {
               subcategories.push({
                 slug: subFolder,
                 label: getDisplayName(subFolder),
@@ -56,11 +74,14 @@ export async function GET() {
           }
         }
 
-        categories.push({
-          slug: folder,
-          label: getDisplayName(folder),
-          ...(subcategories.length > 0 && { subcategories }),
-        })
+        // Only add category if it has images or non-empty subcategories
+        if (hasImages || subcategories.length > 0) {
+          categories.push({
+            slug: folder,
+            label: getDisplayName(folder),
+            ...(subcategories.length > 0 && { subcategories }),
+          })
+        }
       }
     }
 
