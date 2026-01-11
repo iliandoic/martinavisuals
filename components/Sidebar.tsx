@@ -183,7 +183,7 @@ export default function Sidebar() {
                             </svg>
                           </button>
                           <ExpandableMenu isExpanded={isExpanded}>
-                            <ul className="mt-2 ml-3 space-y-2 pt-1">
+                            <ul className="mt-2 ml-3 space-y-2 pt-1 pb-2">
                               {cat.subcategories.map((sub, index) => {
                                 const subHref = `/${cat.slug}/${sub.slug}`
                                 return (
