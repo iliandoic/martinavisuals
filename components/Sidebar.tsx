@@ -41,10 +41,17 @@ function ExpandableMenu({
   const [height, setHeight] = useState(0)
 
   useEffect(() => {
-    if (contentRef.current) {
-      setHeight(contentRef.current.scrollHeight)
-    }
-  }, [children])
+    const el = contentRef.current
+    if (!el) return
+
+    const updateHeight = () => setHeight(el.scrollHeight)
+    updateHeight()
+
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(el)
+
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <div
