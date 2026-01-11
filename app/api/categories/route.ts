@@ -47,7 +47,7 @@ export async function GET() {
           obj.Key && obj.Key !== `${folder}/` && obj.Key.match(/\.(jpg|jpeg|png|webp|gif)$/i)
         )
 
-        const subcategories: { slug: string; label: string }[] = []
+        const subcategories: { slug: string; fullPath: string; label: string }[] = []
 
         if (subResponse.CommonPrefixes) {
           for (const subPrefix of subResponse.CommonPrefixes) {
